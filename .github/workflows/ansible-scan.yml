@@ -1,0 +1,89 @@
+
+name: Ansible-Code-Scanning
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  # =====================================
+  # JOB 1: ANSIBLE LINT
+  # =====================================
+
+  ansible-lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible Lint
+        run: pip install ansible-lint
+
+      - name: Run Ansible Lint
+        run: ansible-lint playbook.yml
+
+
+  # =====================================
+  # JOB 2: YAML LINT
+  # =====================================
+
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install YAML Lint
+        run: pip install yamllint
+
+      - name: Run YAML Lint
+        run: yamllint playbook.yml
+
+
+  # =====================================
+  # JOB 3: ANSIBLE SYNTAX CHECK
+  # =====================================
+
+  ansible-syntax:
+    name: Ansible Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Check Ansible Version
+        run: ansible --version
+
+      - name: Run Syntax Check
+        run: |
+          ansible-playbook \
+            -i inventory.ini \
+            playbook.yml \
+            --syntax-check
